@@ -13,7 +13,7 @@ import domain.RequestStringParameters
  * 24.185.144.104 -  -  [18/Jul/2014:00:00:02 +0000] "GET /_api/dynamicmodel HTTP/1.1" 200 12988 "http://www.heavenberry.com/" "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900V Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
  */
 class NSCAParser {
-                                                                // \\ - is an escape character in java, read the regex as if \\ = \
+  // \\ - is an escape character in java, read the regex as if \\ = \
   private val ipPart = "\\d{1,3}"                               // at least 1 number but not more than 3 times
 
   private val ip = s"($ipPart\\.$ipPart\\.$ipPart\\.$ipPart)?"  // 123.456.7.89
@@ -36,6 +36,10 @@ class NSCAParser {
     } else {
       None
     }
+  }
+
+  def parseRecords(requestRecords: Array[String]):List[Option[RequestStringParameters]]  = {
+    requestRecords.map(parseRecord(_)).toList
   }
 
   private def buildRequestRecord(matcher: Matcher) = {
