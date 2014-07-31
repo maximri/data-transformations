@@ -32,7 +32,7 @@ class NSCAParserLearningTest extends SpecificationWithJUnit {
 
       //38.123.140.114 -  -  [18/Jul/2014:00:00:03 +0000] "GET /cgi-bin/wspd_cgi.sh/WService=wsbroker1/webtools/oscommand.w HTTP/1.1" 301 0 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)"
 
-      "parse one differnt record successfully" in new Context {
+      "parse one different record successfully" in new Context {
         val record = parser.parseRecord(records(1))
 
         record.get.ip === "38.123.140.114"
