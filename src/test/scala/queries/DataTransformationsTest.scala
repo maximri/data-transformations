@@ -46,12 +46,21 @@ class DataTransformationsTest extends SpecificationWithJUnit {
     }
 
     "find top 10 popular URL" in new Context {
-      DataTransformations(records.take(4)).getMostPopularUrls(1) === Set(PopularUrl("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
-      DataTransformations(records.take(4)).getMostPopularUrls() === Set(PopularUrl("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
+      DataTransformations(records.take(4)).getMostPopularUrls(1) === Set(PopularRequestParam("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(1.0/2)))
+      DataTransformations(records.take(4)).getMostPopularUrls() === Set(PopularRequestParam("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(1.0/2)))
       DataTransformations(records.take(9)).getMostPopularUrls(2) ===
-        Set(PopularUrl("http://www.stumbleupon.com/refer.php?url=http%3A%2F%2Fwww.towerinvestment.org%2F",
+        Set(PopularRequestParam("http://www.stumbleupon.com/refer.php?url=http%3A%2F%2Fwww.towerinvestment.org%2F",
                        requestCount = 1,responseSize = 33528,errorRate = 0),
-           PopularUrl("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
+           PopularRequestParam("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
+
+    }
+
+    "find top 10 popular IP subnet " in new Context {
+      DataTransformations(records.take(4)).getMostPopularIPSubnet(1) === Set(PopularRequestParam("144.104",requestCount = 2, responseSize=(27012+12988),errorRate=(2.0/2)))
+      DataTransformations(records.take(4)).getMostPopularIPSubnet() ===
+              Set(PopularRequestParam("144.104",requestCount = 2, responseSize=(27012+12988),errorRate=(2.0/2)),
+                  PopularRequestParam("140.114",requestCount = 1, responseSize=0,errorRate=0),
+                  PopularRequestParam("177.77",requestCount = 1, responseSize=38918,errorRate=0))
 
     }
   }

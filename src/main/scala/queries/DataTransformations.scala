@@ -1,23 +1,42 @@
 package queries
 
 import domain.RequestStringParameters
+import org.apache.commons.lang.StringUtils
 
 /**
  * Created by maximribakov on 7/31/14.
  */
 case class DataTransformations(requests: List[Option[RequestStringParameters]]) {
-  def getMostPopularUrls(numOfRecords: Int = 10) = {
+  def getMostPopularIPSubnet(numOfPopularRecords: Int = 10) = {
 
-    val emptyURLKey: String = "-"
+    val groupByIPSubSetFunc: (Option[RequestStringParameters]) => String = req => {
+      val secondIndexOfDot = StringUtils.ordinalIndexOf(req.get.ip, ".", 2)
+      req.get.ip.substring(secondIndexOfDot + 1)
+    }
+    getMostPopularGroupResultSet(numOfPopularRecords, groupByIPSubSetFunc)
+  }
 
-    val groupByURL = (requests.groupBy(_.get.refererURL)) - emptyURLKey
-    val groupByURLSorted = groupByURL.toList.sortBy(_._2.size)
-    val popularURL = groupByURLSorted.takeRight(numOfRecords)
-    popularURL.map(popularURL => {
-      val urlTransformations: DataTransformations = DataTransformations(popularURL._2)
-      PopularUrl(popularURL._1, urlTransformations.countAllRequest, urlTransformations.sizeUpAllRequestsSize, urlTransformations.countClientErrorRates)
+  private def getMostPopularGroupResultSet(numOfPopularRecords: Int, groupByFunc: (Option[RequestStringParameters]) => String): Set[PopularRequestParam] = {
+    val emptyParamKey: String = "-"
+    val groupByParam = (requests.groupBy(groupByFunc)) - emptyParamKey
 
+    val groupBySortedByResults = groupByParam.toList.sortBy(_._2.size)
+    val popularParam = groupBySortedByResults.takeRight(numOfPopularRecords)
+
+    popularParam.map(popularURL => {
+      val dataTransOnParamRecords = DataTransformations(popularURL._2)
+
+      PopularRequestParam(popularURL._1, dataTransOnParamRecords.countAllRequest,
+                          dataTransOnParamRecords.sizeUpAllRequestsSize, dataTransOnParamRecords.countErrorRates)
     }).toSet
+  }
+
+  def getMostPopularUrls(numOfPopularRecords: Int = 10) = {
+
+    val groupByURLFunc: (Option[RequestStringParameters]) => String = _.get.refererURL
+
+    getMostPopularGroupResultSet(numOfPopularRecords, groupByURLFunc)
+
   }
 
 
