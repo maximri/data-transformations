@@ -53,9 +53,7 @@ case class DataTransformations(requests: List[Option[RequestStringParameters]]) 
   }
 
   def countErrorRates = {
-    val upperBound = 600
-    val lowerBound = 399
-    countErrorRateInRange(upperBound, lowerBound)
+      countClientErrorRates+countServerErrorRates
   }
 
   private def countErrorRateInRange(upperBound: Int, lowerBound: Int): Double = {
