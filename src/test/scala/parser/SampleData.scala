@@ -12,9 +12,9 @@ object SampleNCSALogData {
 
 
   val dataLong = """
-24.185.144.104 -  -  [18/Jul/2014:00:00:02 +0000] "GET /_api/dynamicmodel HTTP/1.1" 200 12988 "http://www.heavenberry.com/" "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900V Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
+24.185.144.104 -  -  [18/Jul/2014:00:00:02 +0000] "GET /_api/dynamicmodel HTTP/1.1" 400 12988 "http://www.heavenberry.com/" "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900V Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
 38.123.140.114 -  -  [18/Jul/2014:00:00:03 +0000] "GET /cgi-bin/wspd_cgi.sh/WService=wsbroker1/webtools/oscommand.w HTTP/1.1" 301 0 "-" "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)"
-173.252.112.112 -  -  [18/Jul/2014:00:00:04 +0000] "GET /?_escaped_fragment_=shoulders-video%2Fc1gaz HTTP/1.1" 200 27012 "-" "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
+173.252.112.112 -  -  [18/Jul/2014:00:00:04 +0000] "GET /?_escaped_fragment_=shoulders-video%2Fc1gaz HTTP/1.1" 500 27012 "-" "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
 203.185.177.77 -  -  [18/Jul/2014:00:00:05 +0000] "GET / HTTP/1.1" 200 38918 "-" "Mozilla/5.0 (Linux; Android 4.1.1; CINK+ Build/JRO03C) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
 173.252.120.113 -  -  [18/Jul/2014:00:00:06 +0000] "GET /?from_fb=1&fb_locale=ja_JP HTTP/1.1" 200 26925 "-" "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
 107.178.200.198 -  -  [18/Jul/2014:00:00:07 +0000] "GET /?gclid=CITKiYLHzb8CFRJk7AodWAIAeg HTTP/1.1" 200 58155 "-" "AppEngine-Google; (+http://code.google.com/appengine; appid: s~wixarchive2)"
