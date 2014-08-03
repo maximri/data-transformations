@@ -6,6 +6,20 @@ import domain.RequestStringParameters
  * Created by maximribakov on 7/31/14.
  */
 case class DataTransformations(requests: List[Option[RequestStringParameters]]) {
+  def getMostPopularUrls(numOfRecords: Int = 10) = {
+
+    val emptyURLKey: String = "-"
+
+    val groupByURL = (requests.groupBy(_.get.refererURL)) - emptyURLKey
+    val groupByURLSorted = groupByURL.toList.sortBy(_._2.size)
+    val popularURL = groupByURLSorted.takeRight(numOfRecords)
+    popularURL.map(popularURL => {
+      val urlTransformations: DataTransformations = DataTransformations(popularURL._2)
+      PopularUrl(popularURL._1, urlTransformations.countAllRequest, urlTransformations.sizeUpAllRequestsSize, urlTransformations.countClientErrorRates)
+
+    }).toSet
+  }
+
 
   def countClientErrorRates = {
     val upperBound = 500
@@ -27,7 +41,7 @@ case class DataTransformations(requests: List[Option[RequestStringParameters]]) 
 
   private def countErrorRateInRange(upperBound: Int, lowerBound: Int): Double = {
     val groupedByErrorRates = requests.map(_.get.httpStatusCode).groupBy(status => status.toInt > lowerBound && status.toInt < upperBound)
-    val totalAmountOfErrors = groupedByErrorRates.getOrElse(true,List.empty).size
+    val totalAmountOfErrors = groupedByErrorRates.getOrElse(true, List.empty).size
     totalAmountOfErrors.toDouble / countAllRequest
   }
 

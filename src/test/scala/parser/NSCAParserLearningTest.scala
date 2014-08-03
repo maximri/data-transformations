@@ -26,7 +26,7 @@ class NSCAParserLearningTest extends SpecificationWithJUnit {
         record.get.request === "GET /_api/dynamicmodel HTTP/1.1"
         record.get.httpStatusCode === "200"
         record.get.bytesSent === "12988"
-        record.get.referer === "http://www.heavenberry.com/"
+        record.get.refererURL === "http://www.heavenberry.com/"
         record.get.userAgent === "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900V Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
       }
 
@@ -42,7 +42,7 @@ class NSCAParserLearningTest extends SpecificationWithJUnit {
         record.get.request == "GET /cgi-bin/wspd_cgi.sh/WService=wsbroker1/webtools/oscommand.w HTTP/1.1"
         record.get.httpStatusCode == "301"
         record.get.bytesSent == "0"
-        record.get.referer == "-"
+        record.get.refererURL == "-"
         record.get.userAgent == "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)"
 
       }

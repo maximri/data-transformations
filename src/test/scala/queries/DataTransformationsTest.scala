@@ -44,5 +44,15 @@ class DataTransformationsTest extends SpecificationWithJUnit {
       DataTransformations(records.take(4)).countServerErrorRates === 1.0/4
       DataTransformations(records.take(13)).countServerErrorRates === 1.0/13
     }
+
+    "find top 10 popular URL" in new Context {
+      DataTransformations(records.take(4)).getMostPopularUrls(1) === Set(PopularUrl("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
+      DataTransformations(records.take(4)).getMostPopularUrls() === Set(PopularUrl("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
+      DataTransformations(records.take(9)).getMostPopularUrls(2) ===
+        Set(PopularUrl("http://www.stumbleupon.com/refer.php?url=http%3A%2F%2Fwww.towerinvestment.org%2F",
+                       requestCount = 1,responseSize = 33528,errorRate = 0),
+           PopularUrl("http://www.heavenberry.com/",requestCount = 2, responseSize=(38918+12988),errorRate=(2.0/4)))
+
+    }
   }
 }

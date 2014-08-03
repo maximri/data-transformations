@@ -11,6 +11,6 @@ case class RequestStringParameters (
                              request: String,                 // `GET /foo ...`
                              httpStatusCode: String,          // 200, 404, etc.
                              bytesSent: String,               // may be `-`
-                             referer: String,                 // where the visitor came from
+                             refererURL: String,                 // where the visitor came from
                              userAgent: String                // long string to represent the browser and OS
                              )
