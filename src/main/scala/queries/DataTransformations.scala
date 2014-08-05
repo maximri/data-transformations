@@ -8,7 +8,7 @@ import org.apache.commons.lang.StringUtils
  */
 case class DataTransformations(requests: List[Request]) {
   def getTheMostErroneousPath = {
-//    val groupedByErrorRates = requests.filter(_.httpStatusCode.get!=None).groupBy(request=>numInRange(600, 399, request.httpStatusCode.get) )
+//    val groupedByErrorRates = requests.filter(_.httpStatusCode.get!=None).groupBy(request=>numInRangeFunc(600, 399, request.httpStatusCode.get) )
 //    //println("groupedByErrorRates = " + groupedByErrorRates)
 //
 //    val requestWithErrorGroupByPath = groupedByErrorRates(true).groupBy(request=> request.refererURL) - "-"
@@ -56,11 +56,11 @@ case class DataTransformations(requests: List[Request]) {
     getMostPopularGroupResultSet(numOfPopularRecords, groupByURLFunc)
   }
 
-  def countClientErrorRates = countErrorRateByFunc(numInRange(upperBound=500, lowerBound=399))
+  def countClientErrorRates = countErrorRateByFunc(numInRangeFunc(upperBound=500, lowerBound=399))
 
-  def countServerErrorRates = countErrorRateByFunc(numInRange(upperBound=600, lowerBound=499))
+  def countServerErrorRates = countErrorRateByFunc(numInRangeFunc(upperBound=600, lowerBound=499))
 
-  def countErrorRates = countErrorRateByFunc(numInRange(upperBound=600, lowerBound=399), isEmptyStatusCodeConsidered = true)
+  def countErrorRates = countErrorRateByFunc(numInRangeFunc(upperBound=600, lowerBound=399), isEmptyStatusCodeConsidered = true)
 
   def sizeUpAllRequestsSize = requests.map(_.bytesSent.getOrElse(0)).foldLeft(0)(_ + _)
 
@@ -75,7 +75,7 @@ case class DataTransformations(requests: List[Request]) {
     totalAmountOfErrors.toDouble / countAllRequest
   }
 
-  private def numInRange(upperBound: Int, lowerBound: Int): (Int=>Boolean) = {
+  private def numInRangeFunc(upperBound: Int, lowerBound: Int): (Int=>Boolean) = {
     num => num > lowerBound && num < upperBound
   }
 }
