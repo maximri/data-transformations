@@ -6,14 +6,16 @@ package parser
 
 import java.util.regex.{Matcher, Pattern}
 
-import domain.RequestStringParameters
+import domain.Request
 
 /**
  * A sample:
- * 24.185.144.104 -  -  [18/Jul/2014:00:00:02 +0000] "GET /_api/dynamicmodel HTTP/1.1" 200 12988 "http://www.heavenberry.com/" "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900V Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
+ * 24.185.144.104 -  -  [18/Jul/2014:00:00:02 +0000] "GET /_api/dynamicmodel HTTP/1.1" 200 12988 "http://www.heavenberry.com/"
+ *                        "Mozilla/5.0 (Linux; Android 4.4.2; SM-G900V Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.141 Mobile Safari/537.36"
  */
 class NSCAParser {
   // \\ - is an escape character in java, read the regex as if \\ = \
+
   private val ipPart = "\\d{1,3}"                               // at least 1 number but not more than 3 times
 
   private val ip = s"($ipPart\\.$ipPart\\.$ipPart\\.$ipPart)?"  // 123.456.7.89
@@ -29,7 +31,7 @@ class NSCAParser {
 
   private val pattern = Pattern.compile(requestRegex)
 
-  def parseRecord(record: String): Option[RequestStringParameters] = {
+  def parseRecord(record: String): Option[Request] = {
     val matcher = pattern.matcher(record)
     if (matcher.find) {
       Some(buildRequestRecord(matcher))
@@ -38,8 +40,8 @@ class NSCAParser {
     }
   }
 
-  def parseRecords(requestRecords: Array[String]):List[Option[RequestStringParameters]]  = {
-    requestRecords.map(parseRecord(_)).toList
+  def parseRecords(requestRecords: Array[String]):List[Request]  = {
+    requestRecords.map(parseRecord(_)).filter(_!=None).map(_.get).toList
   }
 
   private def buildRequestRecord(matcher: Matcher) = {
@@ -48,11 +50,17 @@ class NSCAParser {
     val user: String = matcher.group(3)
     val date: String = matcher.group(4)
     val request: String = matcher.group(5)
-    val status: String = matcher.group(6)
-    val bytes: String = matcher.group(7)
+    val status = matcher.group(6) match {
+      case "-" => None
+      case code => Some(code.toInt)
+    }
+    val bytes = matcher.group(7) match {
+      case "-" => None
+      case size => Some(size.toInt)
+    }
     val referer: String = matcher.group(8)
     val agentData: String = matcher.group(9)
 
-    RequestStringParameters(ip,client,user,date,request,status,bytes,referer,agentData)
+    Request(ip,client,user,date,request,status,bytes,referer,agentData)
   }
 }
