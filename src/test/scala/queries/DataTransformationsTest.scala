@@ -1,3 +1,5 @@
+
+
 package queries
 
 import domain.Request
@@ -11,85 +13,61 @@ import parser.{NSCAParser, SampleNCSALogData}
 class DataTransformationsTest extends SpecificationWithJUnit {
 
   trait Context extends Scope {
+
+    val OK: Some[Int] = Some(200)
+    val CLIENT_ERROR: Some[Int] = Some(400)
+    val SERVER_ERROR: Some[Int] = Some(400)
     //TODO remove after fixing rest of the tests
     val parser = new NSCAParser
     val records = parser.parseRecords(SampleNCSALogData.dataLong)
 
     val recordsWith1EmptyRequest = List(Request())
     val recordsWith3Requests = List(Request(), Request(), Request())
-    val recordsWith4Requests = recordsWith3Requests :+ Request()
-
-    val recordsWith1RequestWithSize = List(Request(bytesSent = Some(12988)))
-    val recordsWith3RequestWithSize = List(Request(bytesSent = Some(12988)), Request(bytesSent = Some(123)), Request(bytesSent = Some(27012)))
-
-    val recordsWith3RequestWithSizeDefinedForJust2 = List(Request(bytesSent = Some(12988)), Request(), Request(bytesSent = Some(27012)))
-
-    val recordsWith1RequestWithSuccessfulHttpStatusCode = List(Request(httpStatusCode = Some(200)))
-    val recordsWith1RequestWithClientErrorHttpStatusCode = List(Request(httpStatusCode = Some(400)))
-    val recordsWith1RequestWithErroneousHttpStatusCode = recordsWith1RequestWithClientErrorHttpStatusCode
-    val recordsWith1RequestWithServerErrorHttpStatusCode = List(Request(httpStatusCode = Some(500)))
-
-    val recordsWith_4_RequestWith_3_ErroneousHttpStatusAnd_1_Successful =
-      List(Request(httpStatusCode = Some(400)),Request(httpStatusCode = Some(400)),
-        Request(httpStatusCode = Some(500)),Request(httpStatusCode = Some(200)))
-
-    // TODO reconsider adding builder for records, this variable name is far too long
-    val recordsWith_5_RequestWhich_1_HasClientErrorHttpStatusAnd_1_HasUndefinedHttpStatusAnd_2_SuccessfulHttpStatusAnd_1_HasServerStatusError =
-      List(Request(httpStatusCode = Some(400)),Request(httpStatusCode = Some(201)),
-        Request(httpStatusCode = Some(200)),Request(httpStatusCode = Some(500)),Request())
-
   }
 
   "DataTransformation" should {
 
     "count all records" in new Context {
-      DataTransformations(recordsWith3Requests).countAllRequest === recordsWith3Requests.size
-      DataTransformations(recordsWith4Requests).countAllRequest === recordsWith4Requests.size
+      DataTransformations(recordsWith1EmptyRequest).countAllRequest === 1
+      DataTransformations(recordsWith3Requests).countAllRequest === 3
     }
 
-    "size up all of the requests size when all records have defined bytesSent(size)" in new Context {
-      DataTransformations(recordsWith1RequestWithSize).sizeUpAllRequestsSize === recordsWith1RequestWithSize.head.bytesSent.getOrElse(0)
-      DataTransformations(recordsWith3RequestWithSize).sizeUpAllRequestsSize ===
-        recordsWith3RequestWithSize(0).bytesSent.getOrElse(0) +
-        recordsWith3RequestWithSize(1).bytesSent.getOrElse(0) +
-        recordsWith3RequestWithSize(2).bytesSent.getOrElse(0)
+    "size up all of the requests size when all just one records" in new Context {
+      DataTransformations(List(Request(bytesSent = Some(100)))).sizeUpAllRequestsSize === 100
+      DataTransformations(recordsWith1EmptyRequest).sizeUpAllRequestsSize === 0
     }
 
-    "size up all of the requests size when some records don't have defined bytesSent(size)" in new Context {
-      DataTransformations(recordsWith1EmptyRequest).sizeUpAllRequestsSize === recordsWith1EmptyRequest.head.bytesSent.getOrElse(0)
-      DataTransformations(recordsWith3RequestWithSizeDefinedForJust2).sizeUpAllRequestsSize ===
-        recordsWith3RequestWithSizeDefinedForJust2(0).bytesSent.getOrElse(0) +
-        recordsWith3RequestWithSizeDefinedForJust2(1).bytesSent.getOrElse(0) +
-        recordsWith3RequestWithSizeDefinedForJust2(2).bytesSent.getOrElse(0)
+    "size up all of the requests size when multiple records" in new Context {
+      DataTransformations(List(
+        Request(bytesSent = Some(129)),
+        Request(),
+        Request(bytesSent = Some(27)))
+      ).sizeUpAllRequestsSize === 129 + 0 + 27
     }
 
-    "count error rate for all request when all of the httpStatusCode are Defined" in new Context {
-      DataTransformations(recordsWith1RequestWithSuccessfulHttpStatusCode).countErrorRates === 0/1
-      DataTransformations(recordsWith1RequestWithErroneousHttpStatusCode).countErrorRates === 1.0/1
-      DataTransformations(recordsWith_4_RequestWith_3_ErroneousHttpStatusAnd_1_Successful).countErrorRates === 3.0/4
+    "count error rate for one request when httpStatus code OK" in new Context {
+      DataTransformations(List(Request(httpStatusCode = OK))).countErrorRates === 0 / 1
     }
 
-    "count error rate for all request when not all of the httpStatusCode are Defined" in new Context {
-      DataTransformations(recordsWith1EmptyRequest).countErrorRates === 1.0/1
-      DataTransformations(recordsWith_5_RequestWhich_1_HasClientErrorHttpStatusAnd_1_HasUndefinedHttpStatusAnd_2_SuccessfulHttpStatusAnd_1_HasServerStatusError).countErrorRates === 3.0 / 5
+    "count error rate for one request when httpStatus is a client error" in new Context {
+      DataTransformations(List(Request(httpStatusCode = CLIENT_ERROR))).countErrorRates === 1 / 1
+    }
+    
+    "count error rate for one request when httpStatus is a server error" in new Context {
+      DataTransformations(List(Request(httpStatusCode = SERVER_ERROR))).countErrorRates === 1 / 1
     }
 
-    "count client error rate for all request when none is an client httpStatus error code" in new Context {
-      DataTransformations(recordsWith1EmptyRequest).countClientErrorRates === 0/1
-      DataTransformations(recordsWith1RequestWithServerErrorHttpStatusCode).countClientErrorRates === 0 / 1
-      DataTransformations(recordsWith1RequestWithSuccessfulHttpStatusCode).countClientErrorRates === 0 / 1
+    "count error rate for one request when httpStatus is not defined" in new Context {
+       DataTransformations(List(Request())).countErrorRates === 1 / 1
     }
 
-    "count client error rate for all request when some have client httpStatus error code" in new Context {
-      DataTransformations(recordsWith1RequestWithClientErrorHttpStatusCode).countClientErrorRates === 1.0 / 1
-      DataTransformations(recordsWith1RequestWithClientErrorHttpStatusCode).countClientErrorRates === 1.0 / 1
-      DataTransformations(recordsWith_5_RequestWhich_1_HasClientErrorHttpStatusAnd_1_HasUndefinedHttpStatusAnd_2_SuccessfulHttpStatusAnd_1_HasServerStatusError).countClientErrorRates === 1.0 / 5
+    "count error rate for multiple requests" in new Context {
+      DataTransformations(List(
+        Request(httpStatusCode = CLIENT_ERROR),
+        Request(httpStatusCode = SERVER_ERROR),
+        Request(httpStatusCode = OK),
+        Request())).countErrorRates === 3 / 4
     }
-
-    "count server error rate" in new Context {
-      DataTransformations(recordsWith_5_RequestWhich_1_HasClientErrorHttpStatusAnd_1_HasUndefinedHttpStatusAnd_2_SuccessfulHttpStatusAnd_1_HasServerStatusError).countServerErrorRates === 1.0 / 5
-    }
-
 
 
     "find top 10 popular URL" in new Context {
