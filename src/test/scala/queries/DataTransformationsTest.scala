@@ -71,6 +71,7 @@ class DataTransformationsTest extends SpecificationWithJUnit {
 
 
     "find top 10 popular URL" in new Context {
+      // TODO remove parser coupling
       DataTransformations(records.take(4)).getMostPopularUrls(1) ===
         Set(PopularRequestParam("http://www.heavenberry.com/", requestCount = 2, responseSize = (38918 + 12988), errorRate = (1.0 / 2)))
       DataTransformations(records.take(4)).getMostPopularUrls() ===
