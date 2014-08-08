@@ -61,7 +61,7 @@ case class DataTransformations(requests: List[Request]) {
     num => num > lowerBound && num < upperBound
   }
 
-  private def getMostPopularGroupResultSet(numOfPopularRecords: Int, groupByFunc: Request => String,prioritizeGroupByFunc:  ((String, List[Request]))=>Int): Set[PopularRequestParam] = {
+  private def getMostPopularGroupResultSet(numOfPopularRecords: Int, groupByFunc: Request => String) = {
 
     val getLargestGroup: ((String, List[Request])) => Int = groupedRequest => groupedRequest._2.size
 

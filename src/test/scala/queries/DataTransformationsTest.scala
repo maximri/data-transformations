@@ -16,7 +16,7 @@ class DataTransformationsTest extends SpecificationWithJUnit {
 
     val OK: Some[Int] = Some(200)
     val CLIENT_ERROR: Some[Int] = Some(400)
-    val SERVER_ERROR: Some[Int] = Some(400)
+    val SERVER_ERROR: Some[Int] = Some(500)
     //TODO remove after fixing rest of the tests
     val parser = new NSCAParser
     val records = parser.parseRecords(SampleNCSALogData.dataLong)
@@ -66,7 +66,31 @@ class DataTransformationsTest extends SpecificationWithJUnit {
         Request(httpStatusCode = CLIENT_ERROR),
         Request(httpStatusCode = SERVER_ERROR),
         Request(httpStatusCode = OK),
-        Request())).countErrorRates === 3 / 4
+        Request())).countErrorRates === 3.0 / 4
+    }
+
+    "count client error rate for one request when httpStatus code OK" in new Context {
+      DataTransformations(List(Request(httpStatusCode = OK))).countClientErrorRates === 0 / 1
+    }
+
+    "count client error rate for one request when httpStatus is a client error" in new Context {
+      DataTransformations(List(Request(httpStatusCode = CLIENT_ERROR))).countClientErrorRates === 1 / 1
+    }
+
+    "count client error rate for one request when httpStatus is a server error" in new Context {
+      DataTransformations(List(Request(httpStatusCode = SERVER_ERROR))).countClientErrorRates === 0 / 1
+    }
+
+    "count client error rate for one request when httpStatus is not defined" in new Context {
+      DataTransformations(List(Request())).countClientErrorRates === 0 / 1
+    }
+
+    "count client error rate for multiple requests" in new Context {
+      DataTransformations(List(
+        Request(httpStatusCode = CLIENT_ERROR),
+        Request(httpStatusCode = SERVER_ERROR),
+        Request(httpStatusCode = OK),
+        Request())).countClientErrorRates === 1.0 / 4
     }
 
 
